@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, TextInput } from 'react-native';
-import { Text, Card, Title, Paragraph, Button } from 'react-native-paper';
+import { Text, Card, Title, Paragraph, Button, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../../scripts/firebaseConfig';
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
@@ -94,6 +94,12 @@ export default function AdminDashboardScreen() {
           </Card>
         )}
       />
+      <FAB
+        style={styles.fab}
+        small
+        icon="home"
+        onPress={() => navigation.navigate('index')}
+      />
     </View>
   );
 }
@@ -103,6 +109,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f0f0f0',
+    marginTop:50
   },
   header: {
     fontSize: 24,
@@ -150,4 +157,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 10,
   },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#6200ea',
+  }
 });

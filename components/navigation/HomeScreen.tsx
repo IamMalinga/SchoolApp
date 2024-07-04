@@ -13,20 +13,25 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
-        if (userDoc.exists()) {
-          setUserDetails(userDoc.data());
+    const unsubscribeAuth = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            setUserDetails(userDoc.data());
+          }
+        } catch (error) {
+          console.error('Error fetching user details:', error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-      } finally {
+      } else {
+        setUserDetails(null);
         setLoading(false);
       }
-    };
+    });
 
-    fetchUserDetails();
+    return () => unsubscribeAuth(); // Cleanup function for unsubscribing from the listener
   }, []);
 
   const logout = async () => {
@@ -50,7 +55,7 @@ export default function HomeScreen() {
         <HomeIcon width={300} height={300} style={styles.icon} />
       )}
       <Text style={styles.header}>
-        Hello {userDetails?.name}, welcome to the School App!
+        Hello {userDetails?.name || 'User'}, welcome to the School App!
       </Text>
       <Card style={styles.card}>
         <Card.Content>

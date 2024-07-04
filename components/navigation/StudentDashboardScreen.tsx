@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, TextInput, ActivityIndicator, RefreshControl, Image, Platform } from 'react-native';
-import { Text, Card, Title, Paragraph, Button } from 'react-native-paper';
+import { Text, Card, Title, Paragraph, Button, FAB } from 'react-native-paper';
 import { db, auth, storage } from '../../scripts/firebaseConfig';
 import { collection, getDocs, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -205,6 +205,12 @@ export default function StudentDashboardScreen() {
           Update Profile
         </Button>
       </View>
+      <FAB
+        style={styles.fab}
+        small
+        icon="home"
+        onPress={() => navigation.navigate('index')}
+      />
     </View>
   );
 }
@@ -305,4 +311,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#6200ea',
+  }
 });

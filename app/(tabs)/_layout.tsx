@@ -1,4 +1,3 @@
-// app/(tabs)/_layout.tsx
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,7 +12,6 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
         tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
-        headerShown: false, // Hide the default header
       }}
     >
       <Tabs.Screen
@@ -27,6 +25,7 @@ export default function TabLayout() {
               size={24}
             />
           ),
+          headerShown: false, // Hide header for Home screen
         }}
       />
       <Tabs.Screen
@@ -40,6 +39,7 @@ export default function TabLayout() {
               size={24}
             />
           ),
+          headerShown: false, // Show header for Motivation screen
         }}
       />
       <Tabs.Screen
@@ -53,6 +53,7 @@ export default function TabLayout() {
               size={24}
             />
           ),
+          headerShown: true, // Show header for Dashboard screen
         }}
       />
     </Tabs>

@@ -1,15 +1,18 @@
 // app/admin/role-management.jsx
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Button, FAB } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import { db } from '../../scripts/firebaseConfig';
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { useNavigation } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function RoleManagementScreen() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRole, setSelectedRole] = useState('');
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -60,6 +63,18 @@ export default function RoleManagementScreen() {
       <Button mode="contained" onPress={handleRoleUpdate}>
         Update Role
       </Button>
+      <FAB
+        style={styles.fab}
+        small
+        icon={({ color, focused }) => (
+          <MaterialCommunityIcons
+            name={focused ? 'view-dashboard' : 'view-dashboard-outline'}
+            color={color}
+            size={24}
+          />
+        )}
+        onPress={() => navigation.navigate('dashboard')}
+      />
     </View>
   );
 }
@@ -78,4 +93,11 @@ const styles = StyleSheet.create({
   userItem: {
     marginBottom: 20,
   },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#6200ea',
+  }
 });

@@ -1,66 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text, Button, FlatList } from 'react-native-paper';
-import { Picker } from '@react-native-picker/picker';
-import { db, updateUserRole } from '../../scripts/firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, FlatList } from 'react-native';
+import { Text, Card, Title, Paragraph, FAB } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { db } from '../../scripts/firebaseConfig';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 
-const RoleManagementScreen = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedRole, setSelectedRole] = useState('');
+export default function StaffDashboardScreen() {
+  const navigation = useNavigation();
+  const [motivations, setMotivations] = useState([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const userSnapshot = await getDocs(collection(db, 'users'));
-      const usersData = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setUsers(usersData);
+    const fetchMotivationsAndUsers = async () => {
+      const motivationSnapshot = await getDocs(collection(db, 'motivations'));
+      const motivationsData = motivationSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Fetch user details
+      const userDetails = {};
+      for (const motivation of motivationsData) {
+        if (!userDetails[motivation.userId]) {
+          const userDoc = await getDoc(doc(db, 'users', motivation.userId));
+          if (userDoc.exists()) {
+            userDetails[motivation.userId] = userDoc.data().name;
+          }
+        }
+      }
+
+      // Map user names to motivations
+      const motivationsWithUserNames = motivationsData.map(motivation => ({
+        ...motivation,
+        userName: userDetails[motivation.userId]
+      }));
+
+      setMotivations(motivationsWithUserNames);
     };
 
-    fetchUsers();
+    fetchMotivationsAndUsers();
   }, []);
-
-  const handleRoleUpdate = async () => {
-    if (selectedUser && selectedRole) {
-      try {
-        await updateUserRole(selectedUser, selectedRole);
-        alert('Role updated successfully!');
-      } catch (error) {
-        console.error('Error updating role:', error);
-        alert('Error updating role, please try again.');
-      }
-    } else {
-      alert('Please select a user and a role to update.');
-    }
-  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Role Management</Text>
+      <Text style={styles.header}>Staff Dashboard</Text>
       <FlatList
-        data={users}
-        keyExtractor={(item) => item.id}
+        data={motivations.sort((a, b) => b.timestamp - a.timestamp)}
+        keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <View style={styles.userItem}>
-            <Text>{item.name}</Text>
-            <Picker
-              selectedValue={selectedUser === item.id ? selectedRole : ''}
-              onValueChange={(itemValue) => {
-                setSelectedUser(item.id);
-                setSelectedRole(itemValue);
-              }}
-            >
-              <Picker.Item label="Select Role" value="" />
-              <Picker.Item label="Student" value="student" />
-              <Picker.Item label="Staff" value="staff" />
-              <Picker.Item label="Admin" value="admin" />
-            </Picker>
-          </View>
+          <Card style={styles.card}>
+            <Card.Content>
+              <View style={styles.motivationItem}>
+                <View style={styles.motivationContent}>
+                  <Title style={styles.title}>{item.userName}</Title>
+                  <Paragraph style={styles.paragraph}>{item.motivation}</Paragraph>
+                </View>
+              </View>
+            </Card.Content>
+          </Card>
         )}
       />
-      <Button mode="contained" onPress={handleRoleUpdate} style={styles.button}>
-        Update Role
-      </Button>
+      <FAB
+        style={styles.fab}
+        small
+        icon="home"
+        onPress={() => navigation.navigate('index')}
+      />
     </View>
   );
 }
@@ -68,25 +72,49 @@ const RoleManagementScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 50,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f0f0f0',
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
   },
-  userItem: {
-    marginBottom: 20,
+  card: {
+    marginVertical: 10,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 10,
+    elevation: 5,
     backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
   },
-  button: {
-    marginTop: 20,
+  motivationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  motivationContent: {
+    flex: 1,
+    paddingLeft: 15,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  paragraph: {
+    fontSize: 14,
+    color: '#666',
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#6200ea',
   },
 });
-
-export default RoleManagementScreen;

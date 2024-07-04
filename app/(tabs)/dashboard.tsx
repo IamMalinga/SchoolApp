@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { auth, getUserRole } from '../../scripts/firebaseConfig';
 
 export default function Dashboard() {
@@ -10,28 +10,33 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState('');
 
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      if (auth.currentUser) {
-        const userRole = await getUserRole(auth.currentUser.uid);
-        setRole(userRole);
-        navigateToDashboard(userRole);
-      }
-      setLoading(false);
-    };
+  const navigateToDashboard = (role) => {
+    if (role === 'admin') {
+      navigation.navigate('admin/dashboard');
+    } else if (role === 'staff') {
+      navigation.navigate('staff/dashboard');
+    } else {
+      navigation.navigate('student/dashboard');
+    }
+  };
 
-    const navigateToDashboard = (role) => {
-      if (role === 'admin') {
-        navigation.navigate('admin/dashboard');
-      } else if (role === 'staff') {
-        navigation.navigate('staff/dashboard');
-      } else {
-        navigation.navigate('student/dashboard');
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchUserRole = async () => {
+        if (auth.currentUser) {
+          const userRole = await getUserRole(auth.currentUser.uid);
+          console.log("Role: ", userRole);
+          setRole(userRole);
+          navigateToDashboard(userRole);
+        }
+        setLoading(false);
+      };
 
-    fetchUserRole();
-  }, [navigation]);
+      fetchUserRole();
+
+      return () => setLoading(true); // Reset loading state on unmount
+    }, [navigation])
+  );
 
   if (loading) {
     return (
