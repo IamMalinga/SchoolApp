@@ -29,7 +29,7 @@ export default function RoleManagementScreen() {
       try {
         const userRef = doc(db, 'users', selectedUser);
         await updateDoc(userRef, { role: selectedRole });
-        alert('Role updated successfully!');
+        alert('Role changed successfully!');
       } catch (error) {
         console.error('Error updating user role:', error);
       }
@@ -98,6 +98,6 @@ const styles = StyleSheet.create({
     margin: 20,
     right: 0,
     bottom: 0,
-    backgroundColor: '#6200ea',
+    backgroundColor: '#6210ea',
   }
 });
