@@ -98,6 +98,6 @@ const styles = StyleSheet.create({
     margin: 20,
     right: 0,
     bottom: 0,
-    backgroundColor: '#6200ea',
+    backgroundColor: '#6210ea',
   }
 });
