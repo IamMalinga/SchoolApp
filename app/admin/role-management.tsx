@@ -29,7 +29,7 @@ export default function RoleManagementScreen() {
       try {
         const userRef = doc(db, 'users', selectedUser);
         await updateDoc(userRef, { role: selectedRole });
-        alert('Role updated successfully!');
+        alert('Role changed successfully!');
       } catch (error) {
         console.error('Error updating user role:', error);
       }
